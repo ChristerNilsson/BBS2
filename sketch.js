@@ -3,9 +3,11 @@
 
   const DEFAULT_GROUP_SIZE = 4;
   const DEFAULT_PLAYER_COUNT = 48;
-  const VALID_RESULTS = new Set(["1", "0", "r"]);
+  const VALID_RESULTS = new Set(["1", "0", "r", "+", "-"]);
   const RESULT_LABELS = { "1": "1 - 0", "0": "0 - 1", r: "½ - ½" };
-  const SCORE = { "1": [1, 0], "0": [0, 1], r: [0.5, 0.5] };
+  const SCORE = { "1": [1, 0], "0": [0, 1], r: [0.5, 0.5], "+": [1, 0], "-": [0, 1] };
+  RESULT_LABELS["+"] = "1 - 0 w.o.";
+  RESULT_LABELS["-"] = "0 - 1 w.o.";
   const params = new URLSearchParams(location.search);
   const tournament = params.get("turnering") || "Bergerturnering";
   const groupSize = Number(params.get("n") || DEFAULT_GROUP_SIZE);
@@ -128,7 +130,8 @@
     const opponent = isWhite ? board.black : board.white;
     if (result === ".") return { label: "", points: 0, opponent, complete: false };
     const points = SCORE[result][isWhite ? 0 : 1];
-    const marker = result === "r" ? "=" : String(points);
+    const marker =
+      result === "r" ? "=" : result === "+" || result === "-" ? (points === 1 ? "+" : "-") : String(points);
     return { label: `${opponent.id}${isWhite ? "w" : "b"}${marker}`, points, opponent, complete: true };
   };
 
@@ -189,19 +192,46 @@
     row.append(cell);
   };
 
-  const appendHeader = (table, labels) => {
+  const appendHeader = (table, labels, classForIndex = () => "") => {
     const row = document.createElement("tr");
-    labels.forEach((label) => {
+    labels.forEach((label, index) => {
       const cell = document.createElement("th");
       cell.textContent = label;
+      const className = classForIndex(index);
+      if (className) cell.className = className;
       row.append(cell);
     });
     table.append(row);
   };
 
+  const renderControls = (container) => {
+    const controls = document.createElement("div");
+    controls.className = "controls";
+    [
+      ["ArrowLeft", "Left"],
+      ["ArrowRight", "Right"],
+      ["ArrowUp", "Up"],
+      ["ArrowDown", "Down"],
+      ["1", "1"],
+      ["0", "0"],
+      [" ", "Space"],
+      ["r", "Remi"],
+      ["+", "+ w.o."],
+      ["-", "- w.o."],
+      ["Delete", "Delete"],
+    ].forEach(([key, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.key = key;
+      button.textContent = label;
+      controls.append(button);
+    });
+    container.append(controls);
+  };
+
   const renderBoards = (container) => {
     const heading = document.createElement("h2");
-    heading.textContent = `${tournament} - Rond ${selectedRound + 1}`;
+    heading.textContent = `Bordslista - Rond ${selectedRound + 1}`;
     container.append(heading);
     const table = document.createElement("table");
     table.className = "boards";
@@ -223,18 +253,15 @@
 
   const renderStandings = (container) => {
     const heading = document.createElement("h2");
-    heading.textContent = `${tournament} - Ställning`;
+    heading.textContent = "Ställning";
     container.append(heading);
     const table = document.createElement("table");
     table.className = "standings";
-    appendHeader(table, [
-      "Grupp",
-      "Id",
-      "Namn",
-      "Elo",
-      ...Array.from({ length: roundCount }, (_, index) => index + 1),
-      "Poäng",
-    ]);
+    appendHeader(
+      table,
+      ["Grupp", "Id", "Namn", "Elo", ...Array.from({ length: roundCount }, (_, index) => index + 1), "Poäng"],
+      (index) => (index >= 4 ? "center" : ""),
+    );
     standings().forEach((standing) => {
       const row = document.createElement("tr");
       appendCell(row, standing.group, "center");
@@ -253,7 +280,9 @@
       <style>
         *{box-sizing:border-box}body{margin:0;padding:16px;color:#111;background:#fff;font:14px/1.35 Arial,sans-serif}
         h1{margin:0 0 4px;font-size:22px}h2{margin:18px 0 6px;font-size:17px}
-        .help{margin:0 0 10px;color:#555}table{border-collapse:collapse;margin-bottom:16px}
+        .help{margin:0 0 10px;color:#555}.controls{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+        button{border:1px solid #777;background:#f7f7f7;padding:4px 9px;font:inherit;cursor:pointer}
+        button:hover{background:#ececec}table{border-collapse:collapse;margin-bottom:16px}
         th,td{border:1px solid #999;padding:3px 7px;text-align:left}.center{text-align:center}.result{min-width:64px}
         .selected{outline:3px solid #1677ff;outline-offset:-3px}.pending{background:#fff1b8}.mismatch{background:#ffb3b3}
         .fatal{color:#900;font-weight:bold}
@@ -265,8 +294,9 @@
     document.body.append(title);
     const help = document.createElement("p");
     help.className = "help";
-    help.textContent = "← → rond • ↑ ↓ bord • 1 vit vinst • 0 vit förlust • space/r remi • Delete radera";
+    help.textContent = "← → rond • ↑ ↓ bord • 1 vit vinst • 0 vit förlust • space/r remi • + vit vinst w.o. • - vit förlust w.o. • Delete radera";
     document.body.append(help);
+    renderControls(document.body);
     renderBoards(document.body);
     renderStandings(document.body);
   };
@@ -275,19 +305,18 @@
     selectedBoard = (selectedBoard + 1) % boardCount;
   };
 
-  document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
-    if (event.key === "ArrowLeft") selectedRound = (selectedRound + roundCount - 1) % roundCount;
-    else if (event.key === "ArrowRight") selectedRound = (selectedRound + 1) % roundCount;
-    else if (event.key === "ArrowUp") selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
-    else if (event.key === "ArrowDown") selectedBoard = (selectedBoard + 1) % boardCount;
-    else if (event.key === "Delete") {
+  const runCommand = (key) => {
+    if (key === "ArrowLeft") selectedRound = (selectedRound + roundCount - 1) % roundCount;
+    else if (key === "ArrowRight") selectedRound = (selectedRound + 1) % roundCount;
+    else if (key === "ArrowUp") selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
+    else if (key === "ArrowDown") selectedBoard = (selectedBoard + 1) % boardCount;
+    else if (key === "Delete") {
       results[selectedRound][selectedBoard] = ".";
       inputState[selectedRound][selectedBoard] = "";
       writeRound(selectedRound);
       advanceBoard();
-    } else if (VALID_RESULTS.has(event.key.toLowerCase()) || event.key === " ") {
-      const value = event.key === " " ? "r" : event.key.toLowerCase();
+    } else if (VALID_RESULTS.has(key.toLowerCase()) || key === " ") {
+      const value = key === " " ? "r" : key.toLowerCase();
       const stored = results[selectedRound][selectedBoard];
       const state = inputState[selectedRound][selectedBoard];
       if (stored === ".") {
@@ -299,9 +328,21 @@
         inputState[selectedRound][selectedBoard] = stored === value ? "confirmed" : "mismatch";
         advanceBoard();
       } else advanceBoard();
-    } else return;
-    event.preventDefault();
+    } else return false;
     render();
+    return true;
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!runCommand(event.key)) return;
+    event.preventDefault();
+  });
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-key]");
+    if (!button) return;
+    runCommand(button.dataset.key);
   });
 
   render();

@@ -20,6 +20,8 @@ I navigeringsinformationen vill jag att • används istf kommatecken som separa
 
 Hjälptexten "Mata in varje resultat två gånger" behövs ej.
 
+Turneringsnamnet behöver bara anges en gång.
+
 ### Url till en turnering med anmälda
 
 Jag behöver en webapplikation som accepterar en parameter n för gruppstorlek samt en lista med spelarnamn.
@@ -62,19 +64,25 @@ Grupp Id Namn Elo  1   2   3   Poäng
 A     1  Adam 1234 2w= 3b1 4w0 1.5
 osv
 
+Centrera rond nummer.
+
 ### Navigering med tangenter
 
 Left, Right: Byter rond
 Up, Down: Byter bord
 
-1 = vit vinst
-0 = vit förlust
+`1` = vit vinst
+`0` = vit förlust
 space = remi
-r = remi
+`r` = remi
+`+` = vit vinst w.o.
+`-` = vit förlust w.o.
 
 Delete = tar bort ett resultat
 
-Tangenterna 1, 0, space, r och Delete innebär alltid att "cursorn" flyttas till nästa bord.
+Tangenterna `1`, `0`, space, `r`, `+`, `-` och Delete innebär alltid att "cursorn" flyttas till nästa bord.
+
+Dessa kommandon ska även vara knappar.
 
 ### Kontroll av inmatning
 
