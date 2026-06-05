@@ -24,7 +24,7 @@ BBS2 förenklar hanteringen på följande sätt:
 
 * Schweizergruppen hanteras direkt av member.schack.se
 
-* När turneringen slutförts kan bergergruppernas resultat matas in i member.schack.se 
+* När turneringen slutförts kan bergergruppernas resultat matas in i member.schack.se, under förutsättning att man svarat NEJ på Vill Du slumpa?
 
 ### Arbetsgång
 
