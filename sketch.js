@@ -6,11 +6,53 @@
   const VALID_RESULTS = new Set(["1", "0", "r", "+", "-"]);
   const RESULT_LABELS = { "1": "1 - 0", "0": "0 - 1", r: "½ - ½" };
   const SCORE = { "1": [1, 0], "0": [0, 1], r: [0.5, 0.5], "+": [1, 0], "-": [0, 1] };
-  RESULT_LABELS["+"] = "1 - 0 w.o.";
-  RESULT_LABELS["-"] = "0 - 1 w.o.";
-  const params = new URLSearchParams(location.search);
+  RESULT_LABELS["+"] = "+ - -";
+  RESULT_LABELS["-"] = "- - +";
+  const hashQuery = location.hash.startsWith("#") ? location.hash.slice(1) : "";
+  const normalizeResultPlus = (query) =>
+    query
+      .split("&")
+      .map((part) => {
+        const separator = part.indexOf("=");
+        const rawKey = separator === -1 ? part : part.slice(0, separator);
+        if (!/^r\d+$/.test(decodeURIComponent(rawKey))) return part;
+        const rawValue = separator === -1 ? "" : part.slice(separator + 1);
+        return `${rawKey}=${rawValue.replace(/\+/g, "%2B")}`;
+      })
+      .join("&");
+  const serverParams = new URLSearchParams(location.search);
+  const clientParams = new URLSearchParams(normalizeResultPlus(hashQuery));
+  Array.from(serverParams.keys()).forEach((key) => {
+    if (!clientParams.has(key)) clientParams.set(key, serverParams.get(key));
+    serverParams.delete(key);
+  });
+  const params = new URLSearchParams(serverParams);
+  clientParams.forEach((value, key) => params.set(key, value));
   const tournament = params.get("turnering") || "Bergerturnering";
   const groupSize = Number(params.get("n") || DEFAULT_GROUP_SIZE);
+  const tournamentId = params.get("id");
+  document.title = tournament;
+
+  const orderedHash = () => {
+    const ordered = new URLSearchParams();
+    ["id", "turnering", "n", "players"].forEach((key) => {
+      if (clientParams.has(key)) ordered.set(key, clientParams.get(key));
+    });
+    Array.from(clientParams.keys())
+      .filter((key) => /^r\d+$/.test(key))
+      .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))
+      .forEach((key) => ordered.set(key, clientParams.get(key)));
+    clientParams.forEach((value, key) => {
+      if (!ordered.has(key)) ordered.set(key, value);
+    });
+    return ordered.toString();
+  };
+
+  const writeUrl = () => {
+    const query = serverParams.toString();
+    const hash = orderedHash();
+    history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}${hash ? `#${hash}` : ""}`);
+  };
 
   const fail = (message) => {
     document.body.innerHTML = "";
@@ -112,10 +154,9 @@
   const writeRound = (round) => {
     const name = `r${round + 1}`;
     const value = results[round].join("").replace(/\.+$/, "");
-    if (value) params.set(name, value);
-    else params.delete(name);
-    const query = params.toString();
-    history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}${location.hash}`);
+    if (value) clientParams.set(name, value);
+    else clientParams.delete(name);
+    writeUrl();
   };
 
   const resultForPlayer = (round, group, player) => {
@@ -185,6 +226,8 @@
 
   const standings = () => groups.flatMap(sortedGroupStandings);
 
+  const enteredResultCount = () => results.flat().filter((result) => result !== ".").length;
+
   const appendCell = (row, value, className = "") => {
     const cell = document.createElement("td");
     cell.textContent = value;
@@ -207,24 +250,30 @@
   const renderControls = (container) => {
     const controls = document.createElement("div");
     controls.className = "controls";
-    [
-      ["ArrowLeft", "Left"],
-      ["ArrowRight", "Right"],
-      ["ArrowUp", "Up"],
-      ["ArrowDown", "Down"],
+    const commands = [
+      ["ArrowLeft", "←"],
+      ["ArrowRight", "→"],
+      ["ArrowUp", "↑"],
+      ["ArrowDown", "↓"],
       ["1", "1"],
       ["0", "0"],
-      [" ", "Space"],
-      ["r", "Remi"],
-      ["+", "+ w.o."],
-      ["-", "- w.o."],
+      ["r", "space/r"],
+      ["+", "+"],
+      ["-", "-"],
       ["Delete", "Delete"],
-    ].forEach(([key, label]) => {
+    ];
+    commands.forEach(([key, label], index) => {
       const button = document.createElement("button");
       button.type = "button";
       button.dataset.key = key;
       button.textContent = label;
       controls.append(button);
+      if (index === 3) {
+        const status = document.createElement("span");
+        status.className = "status";
+        status.textContent = `${enteredResultCount()} av ${boardCount * roundCount} resultat`;
+        controls.append(status);
+      }
     });
     container.append(controls);
   };
@@ -235,9 +284,10 @@
     container.append(heading);
     const table = document.createElement("table");
     table.className = "boards";
-    appendHeader(table, ["Grupp", "Bord", "Vit", "Resultat", "Svart"]);
+    appendHeader(table, ["G", "Bord", "Vit", "Resultat", "Svart"]);
     boardsByRound[selectedRound].forEach((board, index) => {
       const row = document.createElement("tr");
+      if (index > 0 && board.group !== boardsByRound[selectedRound][index - 1].group) row.classList.add("group-start");
       if (index === selectedBoard) row.classList.add("selected");
       if (inputState[selectedRound][index] === "mismatch") row.classList.add("mismatch");
       if (inputState[selectedRound][index] === "pending") row.classList.add("pending");
@@ -259,11 +309,12 @@
     table.className = "standings";
     appendHeader(
       table,
-      ["Grupp", "Id", "Namn", "Elo", ...Array.from({ length: roundCount }, (_, index) => index + 1), "Poäng"],
+      ["G", "Id", "Namn", "Elo", ...Array.from({ length: roundCount }, (_, index) => index + 1), "Poäng"],
       (index) => (index >= 4 ? "center" : ""),
     );
-    standings().forEach((standing) => {
+    standings().forEach((standing, index, rows) => {
       const row = document.createElement("tr");
+      if (index > 0 && standing.group !== rows[index - 1].group) row.classList.add("group-start");
       appendCell(row, standing.group, "center");
       appendCell(row, standing.id, "center");
       appendCell(row, standing.name);
@@ -280,22 +331,27 @@
       <style>
         *{box-sizing:border-box}body{margin:0;padding:16px;color:#111;background:#fff;font:14px/1.35 Arial,sans-serif}
         h1{margin:0 0 4px;font-size:22px}h2{margin:18px 0 6px;font-size:17px}
-        .help{margin:0 0 10px;color:#555}.controls{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
-        button{border:1px solid #777;background:#f7f7f7;padding:4px 9px;font:inherit;cursor:pointer}
-        button:hover{background:#ececec}table{border-collapse:collapse;margin-bottom:16px}
+        h1 a{color:inherit}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 12px}.status{display:inline-flex;align-items:center;min-height:28px;color:#555}
+        button{min-height:28px;border:1px solid #777;background:#f7f7f7;padding:4px 9px;font:inherit;cursor:pointer}
+        button:hover{background:#ececec}table{border:2px solid #555;border-collapse:collapse;margin-bottom:16px}
         th,td{border:1px solid #999;padding:3px 7px;text-align:left}.center{text-align:center}.result{min-width:64px}
-        .selected{outline:3px solid #1677ff;outline-offset:-3px}.pending{background:#fff1b8}.mismatch{background:#ffb3b3}
+        th{border-bottom:2px solid #555}
+        .group-start>td{border-top:2px solid #555}
+        .selected>.result{box-shadow:inset 4px 0 #1677ff}.pending{background:#fff1b8}.mismatch{background:#ffb3b3}
         .fatal{color:#900;font-weight:bold}
-        @media print{.help{display:none}.selected{outline:0}}
+        @media print{.controls{display:none}.selected>.result{box-shadow:none}}
       </style>
     `;
     const title = document.createElement("h1");
-    title.textContent = tournament;
+    if (tournamentId) {
+      const original = document.createElement("a");
+      original.href = `https://member.schack.se/ShowTournamentServlet?id=${encodeURIComponent(tournamentId)}`;
+      original.textContent = tournament;
+      title.append(original);
+    } else {
+      title.textContent = tournament;
+    }
     document.body.append(title);
-    const help = document.createElement("p");
-    help.className = "help";
-    help.textContent = "← → rond • ↑ ↓ bord • 1 vit vinst • 0 vit förlust • space/r remi • + vit vinst w.o. • - vit förlust w.o. • Delete radera";
-    document.body.append(help);
     renderControls(document.body);
     renderBoards(document.body);
     renderStandings(document.body);
@@ -345,5 +401,6 @@
     runCommand(button.dataset.key);
   });
 
+  writeUrl();
   render();
 })();

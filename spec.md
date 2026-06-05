@@ -20,7 +20,14 @@ I navigeringsinformationen vill jag att • används istf kommatecken som separa
 
 Hjälptexten "Mata in varje resultat två gånger" behövs ej.
 
-Turneringsnamnet behöver bara anges en gång.
+Turneringsnamnet behöver bara anges en gång.  
+Dock ska det användas även i fliknamnet.  
+
+Indikera grupperna med en två pixels horisontell linje.
+
+Denna tjockare linje bör även användas av tabellernas ytterkanter samt linjen under th.
+
+Markera aktuell rad med en diskret blå vänsterkant i resultatcellen.
 
 ### Url till en turnering med anmälda
 
@@ -28,7 +35,7 @@ Jag behöver en webapplikation som accepterar en parameter n för gruppstorlek s
 
 Exempel:
 
-http://127.0.0.1:5500/?turnering=Växjö spelen&n=4&players=1984 Adam Nilsson_1954 Bertil Svensson_1812 Cesar Persson_1776 David Eriksson_1912 Erik Karlsson_1917 Filip Jönsson_2026 Gustav Hansson_1945 Helge Ågren
+http://127.0.0.1:5500/#id=17900&turnering=Växjö spelen&n=4&players=1984 Adam Nilsson_1954 Bertil Svensson_1812 Cesar Persson_1776 David Eriksson_1912 Erik Karlsson_1917 Filip Jönsson_2026 Gustav Hansson_1945 Helge Ågren
 
 De första fyra tecknena utgör elo-talet.
 Spelarna ska sorteras enligt fallande elo-tal
@@ -43,6 +50,11 @@ r3=110r010011rr0011rr00rr11
 Remi visas alltså med r.
 
 Urlen uppdateras för varje inmatat resultat
+
+Markera i urlen att inga parametrar behöver skickas till servern med #. Detta för att minska roundtrippen.  
+Parametrarna ska stå i ordning: id, turnering, n, players, r1, r2 ...
+
+Använd history.replaceState för att minska mängden länkar i historiken
 
 Bergerlottningen ska skötas med hjälp av berger_4.js
 
@@ -70,6 +82,7 @@ Centrera rond nummer.
 
 Left, Right: Byter rond
 Up, Down: Byter bord
+Ovanstående kommandon ska visas som pilar.
 
 `1` = vit vinst
 `0` = vit förlust
@@ -78,11 +91,28 @@ space = remi
 `+` = vit vinst w.o.
 `-` = vit förlust w.o.
 
+space/r ska visas på en enda knapp
+w.o. ska visas bara med + och -
+
 Delete = tar bort ett resultat
 
 Tangenterna `1`, `0`, space, `r`, `+`, `-` och Delete innebär alltid att "cursorn" flyttas till nästa bord.
 
+w.o. ska visas med `+ - -` och `- - +`.
+
+Grupp ska förkortas till G
+
 Dessa kommandon ska även vara knappar.
+
+Hjälpraden kan tas bort.
+
+Visa hur många resultat som matats in samt antal partier totalt. 
+
+Placera "8 av 12 resultat" till höger om de fyra piltangenterna.
+
+Gör turneringsnamnet till en länk till originalturneringen på medlemssystemet.  
+Använd parametern id som har värdet 17900 i exemplet nedan.  
+https://member.schack.se/ShowTournamentServlet?id=17900  
 
 ### Kontroll av inmatning
 
