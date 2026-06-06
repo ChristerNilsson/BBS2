@@ -8,7 +8,7 @@ Skapa följande filer:
 * index.html
 
 Programmet ska hantera ett antal bergergrupper med n deltagare i varje grupp.  
-Med n deltagare blir det n-1 ronder.
+Med n deltagare blir det n-1 ronder.  
 
 Antag att vi har 48 spelare.
 
@@ -35,11 +35,11 @@ Jag behöver en webapplikation som accepterar en parameter n för gruppstorlek s
 
 Exempel:
 
-http://127.0.0.1:5500/#id=17900&turnering=Växjö spelen&n=4&players=1984 Adam Nilsson_1954 Bertil Svensson_1812 Cesar Persson_1776 David Eriksson_1912 Erik Karlsson_1917 Filip Jönsson_2026 Gustav Hansson_1945 Helge Ågren
+http://127.0.0.1:5500/#id=17900&turnering=Växjö spelen 2026&n=4&players=1984 Adam Nilsson_1954 Bertil Svensson_1812 Cesar Persson_1776 David Eriksson_1912 Erik Karlsson_1917 Filip Jönsson_2026 Gustav Hansson_1945 Helge Ågren
 
-De första fyra tecknena utgör elo-talet.
-Spelarna ska sorteras enligt fallande elo-tal
-Lottningen behöver ej stå i urlen, den är samma varje gång.
+* De första fyra tecknena utgör elo-talet.
+* Spelarna ska sorteras enligt fallande elo-tal
+* Lottningen behöver ej stå i urlen, den är samma varje gång.
 
 Resultaten lagras i urlen i bordsordning:
 
@@ -62,41 +62,45 @@ Bergerlottningen ska skötas med hjälp av berger_4.js
 
 Lämplig rubrik
 
+```
 Grupp Bord Vit   Resultat Svart
 A     1    Adam     -     Bertil
 A     2    Cesar    -     David
 B     3    Erik     -     Filip
 osv
+```
 
 ### Standings ser ut så här, 48 rader
 
 Lämplig rubrik
 
+```
 Grupp Id Namn Elo  1   2   3   Poäng
 A     1  Adam 1234 2w= 3b1 4w0 1.5
 osv
+```
 
-Centrera rond nummer.
+Centrera rondnummer.
 
 ### Navigering med tangenter
 
-Left, Right: Byter rond
-Up, Down: Byter bord
-Ovanstående kommandon ska visas som pilar.
+Left, Right: Byter rond  
+Up, Down: Byter bord  
+Ovanstående kommandon ska visas som pilar  
 
-`1` = vit vinst
-`0` = vit förlust
-space = remi
-`r` = remi
-`+` = vit vinst w.o.
-`-` = vit förlust w.o.
+`1` = vit vinst  
+`0` = vit förlust  
+space = remi  
+`r` = remi  
+`+` = vit vinst w.o.  
+`-` = vit förlust w.o.  
 
-space/r ska visas på en enda knapp
-w.o. ska visas bara med + och -
+space/r ska visas på en enda knapp  
+w.o. ska visas bara med + och -  
 
-Delete = tar bort ett resultat
+Backspace = ställer sig på förra raden och tar bort resultat
 
-Tangenterna `1`, `0`, space, `r`, `+`, `-` och Delete innebär alltid att "cursorn" flyttas till nästa bord.
+Tangenterna `1`, `0`, space, `r`, `+`, `-` innebär alltid att "cursorn" flyttas till nästa bord.
 
 w.o. ska visas med `+ - -` och `- - +`.
 
@@ -118,13 +122,13 @@ https://member.schack.se/ShowTournamentServlet?id=17900
 
 Man ska kunna mata in resultaten två gånger för att säkerställa korrekt inmatning.
 Då man trycker på 10r andra gången flaggas mismatch med röd färg.
-Delete måste användas om man vill ändra ett resultat.
+Backspace måste användas om man vill ändra ett resultat.
 
-Exempel:
-Första inmatning: 1r0
-Andra  inmatning: 100
+Exempel:  
+Första inmatning: 1r0  
+Andra  inmatning: 100  
 
-Nu ska det andra bordet visa rött. Då går man dit, trycker på Delete och matar in korrekt resultat
+Nu ska det andra bordet visa rött. Då går man dit, trycker på Backspace och matar in korrekt resultat
 
 ### Sortering av Standings
 

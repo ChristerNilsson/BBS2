@@ -108,7 +108,7 @@
     const rounds = window.berger(size);
     console.log(`Berger schedule for ${size} players:`);
     rounds.forEach((pairs, round) => {
-      console.log(`R${round + 1}: ${pairs.map(([a, b]) => `(${a}, ${b})`).join(", ")}`);
+      console.log(`R${round + 1}: ${pairs.map(([a, b]) => `(${a}, ${b})`).join(" • ")}`);
     });
     return rounds;
   };
@@ -260,7 +260,7 @@
       ["r", "space/r"],
       ["+", "+"],
       ["-", "-"],
-      ["Delete", "Delete"],
+      ["Backspace", "Backspace"],
     ];
     commands.forEach(([key, label], index) => {
       const button = document.createElement("button");
@@ -361,16 +361,24 @@
     selectedBoard = (selectedBoard + 1) % boardCount;
   };
 
+  const clearSelectedResult = () => {
+    results[selectedRound][selectedBoard] = ".";
+    inputState[selectedRound][selectedBoard] = "";
+    writeRound(selectedRound);
+  };
+
+  const backspaceResult = () => {
+    selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
+    clearSelectedResult();
+  };
+
   const runCommand = (key) => {
     if (key === "ArrowLeft") selectedRound = (selectedRound + roundCount - 1) % roundCount;
     else if (key === "ArrowRight") selectedRound = (selectedRound + 1) % roundCount;
     else if (key === "ArrowUp") selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
     else if (key === "ArrowDown") selectedBoard = (selectedBoard + 1) % boardCount;
-    else if (key === "Delete") {
-      results[selectedRound][selectedBoard] = ".";
-      inputState[selectedRound][selectedBoard] = "";
-      writeRound(selectedRound);
-      advanceBoard();
+    else if (key === "Backspace") {
+      backspaceResult();
     } else if (VALID_RESULTS.has(key.toLowerCase()) || key === " ") {
       const value = key === " " ? "r" : key.toLowerCase();
       const stored = results[selectedRound][selectedBoard];

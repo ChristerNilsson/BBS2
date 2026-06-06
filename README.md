@@ -28,18 +28,17 @@ BBS2 förenklar hanteringen på följande sätt:
 
 ### Arbetsgång
 
-1. Logga in på medlemssystemet
+1. Logga in på medlemssystemet.
 1. Turneringar | Skapa Turnering | TEST, 3 ronder
 1. Lägg till 8 deltagare
 1. Ändra gruppuppgifter
 1. Gruppuppdelningsstorlek 4
 1. Spara
+1. Stoppa anmälningar
 1. Pricka av deltagare | Närvarande
-
 1. Visa publik sida
 1. Kör Bookmarklet BBS1
 1. Kopiera urlen till säker plats
-
 1. Dela upp gruppen
 1. Byt namn på *_1, *_2... till A, B...
 1. Lottning
@@ -51,13 +50,13 @@ BBS2 förenklar hanteringen på följande sätt:
 * Schweizergruppen är den sista, om den existerar.
 * Den lottas på normalt sätt, i member.schack.se
 
-### Överföring av resultat
+### Överföring av resultat till member.schack.se
 
-* Utgående från utskrivna och ifyllda Bordslistor för Bergergrupperna
+* Utgå från utskrivna och ifyllda Bordslistor för Bergergrupperna
 * Uppdatera resultaten, grupp för grupp
 * Rond för rond
 * Parti för parti
-* Om vi inte hade undvikit slumpning i punkt 14, hade lottningarna blivit helt olika.
+* Om vi inte hade undvikit slumpning i punkt 15, hade lottningarna blivit helt olika.
 
 ### Jämförelse med Prestationsrating mellan alla grupper inklusive Schweizer
 
