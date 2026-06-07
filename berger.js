@@ -51,11 +51,11 @@ export function bergerRound(n, rond) {
     ]);
   }
 
-  if (rond % 2 === 0) {
-    for (const game of games) {
-      game.reverse();
-    }
-  }
+  // if (rond % 2 === 0) {
+  //   for (const game of games) {
+  //     game.reverse();
+  //   }
+  // }
 
   return boardOrder(boardCount).map(board => games[board - 1]);
 }
