@@ -1,5 +1,6 @@
-(() => {
   "use strict";
+
+  import {berger} from "./berger.js"; 
 
   const DEFAULT_GROUP_SIZE = 4;
   const DEFAULT_PLAYER_COUNT = 48;
@@ -74,8 +75,7 @@
     .split("_")
     .map((value) => value.trim())
     .filter(Boolean)
-    .map(parsePlayer)
-    .sort((a, b) => b.elo - a.elo || a.order - b.order);
+    .map(parsePlayer);
 
   const players = suppliedPlayers.length
     ? suppliedPlayers
@@ -420,4 +420,3 @@
 
   writeUrl();
   render();
-})();

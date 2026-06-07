@@ -29,7 +29,7 @@ function boardOrder(boardCount) {
   return order;
 }
 
-function bergerRound(n, rond) {
+export function bergerRound(n, rond) {
   assertEvenPlayerCount(n);
   assertRound(n, rond);
 
@@ -60,7 +60,7 @@ function bergerRound(n, rond) {
   return boardOrder(boardCount).map(board => games[board - 1]);
 }
 
-function berger(n, rond) {
+export function berger(n, rond) {
   assertEvenPlayerCount(n);
 
   if (rond === undefined) {
@@ -70,12 +70,8 @@ function berger(n, rond) {
   return bergerRound(n, rond);
 }
 
-function formatBoardList(boardList) {
+export function formatBoardList(boardList) {
   return boardList.map(([white, black]) => `${white}-${black}`).join('\n');
-}
-
-if (typeof module !== 'undefined') {
-  module.exports = { berger, bergerRound, formatBoardList };
 }
 
 if (typeof window !== 'undefined') {

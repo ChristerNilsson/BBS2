@@ -40,6 +40,8 @@ http://127.0.0.1:5500/#id=16442&turnering=V%C3%A4xj%C3%B6spelen+2025&n=4&players
 * De första fyra tecknena utgör elo-talet.
 * Lottningen behöver ej stå i urlen, den är samma varje gång.
 
+Observera att spelarna befinner sig i sin startordning. Spelarna är slumpade och därför ska ingen sortering ske.
+
 Resultaten lagras i urlen i bordsordning:
 
 r1=110r010011rr0011rr00rr11  
