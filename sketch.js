@@ -92,7 +92,7 @@
     fail(`Antalet spelare (${players.length}) måste vara jämnt delbart med n (${groupSize}).`);
   }
   if (typeof window.berger !== "function") {
-    fail("Bergerlottningen kunde inte laddas från berger_4.js.");
+    fail("Bergerlottningen kunde inte laddas från berger.js.");
   }
 
   const groupName = (index) => {
@@ -148,7 +148,7 @@
   };
 
   const results = Array.from({ length: roundCount }, (_, round) => readRound(round));
-  const inputState = results.map((round) => round.map((result) => (result === "." ? "" : "pending")));
+  const inputState = results.map((round) => round.map((result) => (result === "." ? "" : "confirmed")));
   let selectedRound = 0;
   let selectedBoard = 0;
 
@@ -375,7 +375,9 @@
   };
 
   const backspaceResult = () => {
-    selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
+    if (results[selectedRound][selectedBoard] === ".") {
+      selectedBoard = (selectedBoard + boardCount - 1) % boardCount;
+    }
     clearSelectedResult();
   };
 

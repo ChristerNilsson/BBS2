@@ -55,7 +55,7 @@ Parametrarna ska stå i ordning: id, turnering, n, players, r1, r2 ...
 
 Använd history.replaceState för att minska mängden länkar i historiken
 
-Bergerlottningen ska skötas med hjälp av berger_4.js
+Bergerlottningen ska skötas med hjälp av berger.js
 
 ### Bordslistan ser ut så här, 24 rader
 
