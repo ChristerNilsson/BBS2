@@ -23,7 +23,7 @@ function berger(n) {
     return order;
   }
 
-  const order = boardOrder(m);
+  const order = m // boardOrder(m);
   const rounds = [];
 
   for (let r = 1; r < n; r += 1) {
