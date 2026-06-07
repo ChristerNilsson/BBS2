@@ -4,6 +4,7 @@
   const DEFAULT_GROUP_SIZE = 4;
   const DEFAULT_PLAYER_COUNT = 48;
   const VALID_RESULTS = new Set(["1", "0", "r", "+", "-"]);
+  const RESULT_KEYS = new Set(["1", "0", "r", "+", "-"]);
   const RESULT_LABELS = { "1": "1 - 0", "0": "0 - 1", r: "½ - ½" };
   const SCORE = { "1": [1, 0], "0": [0, 1], r: [0.5, 0.5], "+": [1, 0], "-": [0, 1] };
   RESULT_LABELS["+"] = "+ - -";
@@ -227,6 +228,8 @@
   const standings = () => groups.flatMap(sortedGroupStandings);
 
   const enteredResultCount = () => results.flat().filter((result) => result !== ".").length;
+  const pendingResultCount = () => inputState.flat().filter((state) => state === "pending").length;
+  const mismatchResultCount = () => inputState.flat().filter((state) => state === "mismatch").length;
 
   const appendCell = (row, value, className = "") => {
     const cell = document.createElement("td");
@@ -267,11 +270,15 @@
       button.type = "button";
       button.dataset.key = key;
       button.textContent = label;
+      button.title = key === "r" ? "space/r" : key;
       controls.append(button);
       if (index === 3) {
         const status = document.createElement("span");
         status.className = "status";
-        status.textContent = `${enteredResultCount()} av ${boardCount * roundCount} resultat`;
+        const details = [];
+        if (pendingResultCount()) details.push(`${pendingResultCount()} väntar på kontroll`);
+        if (mismatchResultCount()) details.push(`${mismatchResultCount()} mismatch`);
+        status.textContent = `${enteredResultCount()} av ${boardCount * roundCount} resultat${details.length ? ` • ${details.join(" • ")}` : ""}`;
         controls.append(status);
       }
     });
@@ -337,7 +344,7 @@
         th,td{border:1px solid #999;padding:3px 7px;text-align:left}.center{text-align:center}.result{min-width:64px}
         th{border-bottom:2px solid #555}
         .group-start>td{border-top:2px solid #555}
-        .selected>.result{box-shadow:inset 4px 0 #1677ff}.pending{background:#fff1b8}.mismatch{background:#ffb3b3}
+        .selected>.result{box-shadow:inset 4px 0 #1677ff}.pending>.result{background:#fff7d6}.mismatch>.result{background:#ffb3b3}
         .fatal{color:#900;font-weight:bold}
         @media print{.controls{display:none}.selected>.result{box-shadow:none}}
       </style>
@@ -379,7 +386,7 @@
     else if (key === "ArrowDown") selectedBoard = (selectedBoard + 1) % boardCount;
     else if (key === "Backspace") {
       backspaceResult();
-    } else if (VALID_RESULTS.has(key.toLowerCase()) || key === " ") {
+    } else if (RESULT_KEYS.has(key.toLowerCase()) || key === " ") {
       const value = key === " " ? "r" : key.toLowerCase();
       const stored = results[selectedRound][selectedBoard];
       const state = inputState[selectedRound][selectedBoard];
