@@ -24,7 +24,7 @@ BBS2 förenklar hanteringen på följande sätt:
 
 * Schweizergruppen hanteras direkt av member.schack.se
 
-* När turneringen slutförts kan bergergruppernas resultat matas in i member.schack.se, under förutsättning att man svarat NEJ på Vill Du slumpa?
+* När turneringen slutförts kan bergergruppernas resultat matas in i member.schack.se.
 
 ### Arbetsgång
 
@@ -34,21 +34,20 @@ BBS2 förenklar hanteringen på följande sätt:
 1. Ändra gruppuppgifter
 1. Gruppuppdelningsstorlek 4
 1. Spara
-1. Stoppa anmälningar
 1. Pricka av deltagare | Närvarande
-1. Visa publik sida
-1. Kör Bookmarklet BBS1
-1. Kopiera urlen till säker plats
 1. Dela upp gruppen
 1. Byt namn på *_1, *_2... till A, B...
 1. Lottning
-1. Lotta nästa rond (Vill du slumpa? NEJ!)
+1. Lotta nästa rond
+1. Visa publik sida
+1. Kör Bookmarklet BBS1
+1. Kopiera urlen till säker plats
 
 ### Spela ronderna
 
 * BBS2 används för alla Bergerronderna
 * Schweizergruppen är den sista, om den existerar.
-* Den lottas på normalt sätt, i member.schack.se
+	* Den lottas på normalt sätt, i member.schack.se
 
 ### Överföring av resultat till member.schack.se
 
@@ -56,7 +55,6 @@ BBS2 förenklar hanteringen på följande sätt:
 * Uppdatera resultaten, grupp för grupp
 * Rond för rond
 * Parti för parti
-* Om vi inte hade undvikit slumpning i punkt 15, hade lottningarna blivit helt olika.
 
 ### Jämförelse med Prestationsrating mellan alla grupper inklusive Schweizer
 
